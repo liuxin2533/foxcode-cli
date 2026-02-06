@@ -10,9 +10,14 @@
 
 1. 登录 [npmjs.com](https://www.npmjs.com/)
 2. 点击头像 → **Access Tokens**
-3. 点击 **Generate New Token** → **Classic Token**
-4. 选择 **Automation** 类型
-5. 复制生成的 Token
+3. 点击 **Generate New Token** → **Granular Access Token**
+4. 填写配置：
+   - **Token name**: `GithubAction`（或任意名称）
+   - **Expiration**: 选择过期时间（建议 1 year）
+   - **Packages and scopes** → **Permissions**: 选择 **Read and write**
+   - 如果有 Organizations，也设置相应权限
+5. 点击 **Generate Token**
+6. 复制生成的 Token（只显示一次，请妥善保存）
 
 ### 2. 配置 GitHub Secrets
 
