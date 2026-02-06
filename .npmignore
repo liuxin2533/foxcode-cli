@@ -1,0 +1,34 @@
+# Source files
+src/
+tsconfig.json
+tsup.config.ts
+
+# Development files
+.eslintrc.json
+.prettierrc
+test-cli.ps1
+
+# Documentation (keep only essential)
+CONTRIBUTING.md
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Tests
+*.test.ts
+__tests__/
+
+# Examples (optional, can be included)
+# example/
+
+# Old files
+*.ps1
+!foxcode.cmd

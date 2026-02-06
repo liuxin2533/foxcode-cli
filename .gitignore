@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test
+coverage/
+.nyc_output/
+
+# Temporary
+tmp/
+temp/
+
+# Old PowerShell files (deprecated)
+*.ps1
+!test-cli.ps1
+
+# Documentation (keep only main ones)
+COMMANDS.md
+USAGE.md
+QUICKSTART.md
+IMPROVEMENTS.md
+README-v2.md

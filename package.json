@@ -1,0 +1,79 @@
+{
+  "name": "foxcode",
+  "version": "1.0.0",
+  "description": "快速切换 Claude Code、Codex、Gemini CLI 配置的命令行工具",
+  "type": "module",
+  "bin": {
+    "foxcode": "./dist/index.js",
+    "foxcode.cmd": "./foxcode.cmd"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "foxcode": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "cli",
+    "claude",
+    "claude-code",
+    "codex",
+    "gemini",
+    "gemini-cli",
+    "config",
+    "configuration",
+    "tool",
+    "ai",
+    "assistant",
+    "developer-tools"
+  ],
+  "author": "FoxCode Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liuxin2533/foxcode-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/liuxin2533/foxcode-cli/issues"
+  },
+  "homepage": "https://github.com/liuxin2533/foxcode-cli#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "foxcode.cmd",
+    "LICENSE",
+    "README.md"
+  ],
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "boxen": "^7.1.1",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "conf": "^13.0.1",
+    "dotenv": "^16.4.5",
+    "figures": "^6.1.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.3.7",
+    "ora": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.17.6",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
+}
