@@ -81,16 +81,25 @@ foxcode use
 
 ## 📖 命令
 
+### 交互式主菜单
+
+直接运行 `foxcode`（不带参数）会显示 ASCII art Banner 和交互式主菜单，可以选择任意操作：
+
+```bash
+foxcode
+```
+
 ### 基础命令
 
-| 命令                    | 说明         | 示例                |
-| ----------------------- | ------------ | ------------------- |
-| `foxcode add`           | 添加新配置   | `foxcode add`       |
-| `foxcode ls`            | 列出所有配置 | `foxcode ls`        |
-| `foxcode edit [name]`   | 编辑配置     | `foxcode edit prod` |
-| `foxcode use [name]`    | 切换配置     | `foxcode use dev`   |
-| `foxcode remove [name]` | 删除配置     | `foxcode rm test`   |
-| `foxcode current`       | 显示当前配置 | `foxcode current`   |
+| 命令                    | 别名         | 说明         | 示例                |
+| ----------------------- | ------------ | ------------ | ------------------- |
+| `foxcode add`           | `foxcode i`  | 添加新配置   | `foxcode i`         |
+| `foxcode ls`            | `foxcode list` | 列出所有配置 | `foxcode ls`      |
+| `foxcode edit [name]`   |              | 编辑配置     | `foxcode edit prod` |
+| `foxcode use [name]`    | `foxcode sw` | 切换配置     | `foxcode sw dev`    |
+| `foxcode remove [name]` | `foxcode rm` | 删除配置     | `foxcode rm test`   |
+| `foxcode current`       |              | 显示当前配置 | `foxcode current`   |
+| `foxcode status`        | `foxcode st` | 状态总览     | `foxcode st`        |
 
 ### 备份管理
 
