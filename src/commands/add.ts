@@ -1,11 +1,13 @@
 import inquirer from 'inquirer';
 import ora from 'ora';
+import chalk from 'chalk';
 import { configStore } from '../config/store.js';
 import { TOOL_CONFIGS } from '../config/presets.js';
 import { CliTool, ConfigProfile } from '../config/types.js';
 import { getHandler } from '../handlers/index.js';
 import { logger } from '../utils/logger.js';
 import { validator } from '../utils/validator.js';
+import { promptUrlSelection } from '../utils/prompts.js';
 
 /**
  * 添加配置命令
@@ -58,79 +60,7 @@ export async function addCommand(): Promise<void> {
     const normalizedName = validator.normalizeName(name.trim());
 
     // 3. 选择或输入 URL
-    let url: string;
-    const urlPresets = toolConfig.urlPresets;
-
-    if (urlPresets.length === 2 && urlPresets[1].value === 'custom') {
-      // 只有一个预设 + 自定义选项，直接询问是否使用默认
-      const { useDefault } = await inquirer.prompt<{ useDefault: boolean }>([
-        {
-          type: 'confirm',
-          name: 'useDefault',
-          message: `使用默认 URL (${urlPresets[0].value})?`,
-          default: true,
-        },
-      ]);
-
-      if (useDefault) {
-        url = urlPresets[0].value;
-      } else {
-        const { customUrl } = await inquirer.prompt<{ customUrl: string }>([
-          {
-            type: 'input',
-            name: 'customUrl',
-            message: '请输入自定义 URL:',
-            validate: (input: string) => {
-              const trimmed = input.trim();
-              if (!trimmed) {
-                return 'URL 不能为空';
-              }
-              if (!validator.isValidUrl(trimmed)) {
-                return 'URL 格式无效，必须以 http:// 或 https:// 开头';
-              }
-              return true;
-            },
-          },
-        ]);
-        url = validator.normalizeUrl(customUrl.trim());
-      }
-    } else {
-      // 多个预设，显示选择列表
-      const { selectedUrl } = await inquirer.prompt<{ selectedUrl: string }>([
-        {
-          type: 'list',
-          name: 'selectedUrl',
-          message: '选择 URL:',
-          choices: urlPresets.map((preset) => ({
-            name: `${preset.label} ${preset.value !== 'custom' ? `(${preset.value})` : ''}`,
-            value: preset.value,
-          })),
-        },
-      ]);
-
-      if (selectedUrl === 'custom') {
-        const { customUrl } = await inquirer.prompt<{ customUrl: string }>([
-          {
-            type: 'input',
-            name: 'customUrl',
-            message: '请输入自定义 URL:',
-            validate: (input: string) => {
-              const trimmed = input.trim();
-              if (!trimmed) {
-                return 'URL 不能为空';
-              }
-              if (!validator.isValidUrl(trimmed)) {
-                return 'URL 格式无效，必须以 http:// 或 https:// 开头';
-              }
-              return true;
-            },
-          },
-        ]);
-        url = validator.normalizeUrl(customUrl.trim());
-      } else {
-        url = selectedUrl;
-      }
-    }
+    const url = await promptUrlSelection(toolConfig.urlPresets) as string;
 
     // 4. 输入 API Key
     const { apiKey } = await inquirer.prompt<{ apiKey: string }>([
@@ -192,9 +122,14 @@ export async function addCommand(): Promise<void> {
         }
       }
 
-      logger.newLine();
-      logger.success(`配置 "${normalizedName}" 已添加成功！`);
-      logger.info(`使用 "foxcode use ${normalizedName}" 可以随时切换到此配置`);
+      const boxContent = [
+        `${chalk.bold('工具')}    ${toolConfig.displayName}`,
+        `${chalk.bold('配置')}    ${normalizedName}`,
+        `${chalk.bold('URL')}     ${url}`,
+      ].join('\n');
+
+      logger.box(boxContent, { title: '配置添加成功', type: 'success' });
+      logger.info(`运行 ${chalk.cyan(`foxcode use ${normalizedName}`)} 可以随时切换到此配置`);
     } catch (error) {
       spinner.fail('保存配置失败');
       throw error;

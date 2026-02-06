@@ -43,4 +43,13 @@ export const validator = {
   normalizeName(name: string): string {
     return name.trim().toLowerCase();
   },
+  /**
+   * API Key 脱敏显示
+   */
+  maskApiKey(apiKey: string): string {
+    if (apiKey.length > 20) {
+      return apiKey.substring(0, 10) + '...' + apiKey.substring(apiKey.length - 5);
+    }
+    return apiKey;
+  },
 };

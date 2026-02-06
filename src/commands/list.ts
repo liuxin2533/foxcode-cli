@@ -3,6 +3,7 @@ import Table from 'cli-table3';
 import { configStore } from '../config/store.js';
 import { TOOL_CONFIGS } from '../config/presets.js';
 import { logger } from '../utils/logger.js';
+import { validator } from '../utils/validator.js';
 import figures from 'figures';
 
 /**
@@ -12,8 +13,8 @@ export async function listCommand(): Promise<void> {
   const profiles = configStore.getAllProfiles();
 
   if (profiles.length === 0) {
-    logger.warn('暂无配置');
-    logger.info('使用 "foxcode add" 添加新配置');
+    logger.warn('还没有任何配置，快来添加一个吧！');
+    logger.info(`运行 ${chalk.cyan('foxcode add')} 开始添加配置`);
     return;
   }
 
@@ -50,11 +51,7 @@ export async function listCommand(): Promise<void> {
       const status = isCurrent ? chalk.green(figures.tick) : ' ';
       const name = isCurrent ? chalk.green.bold(profile.name) : profile.name;
       const url = chalk.gray(profile.url);
-      const apiKey = chalk.gray(
-        profile.apiKey.length > 20
-          ? profile.apiKey.substring(0, 10) + '...' + profile.apiKey.substring(profile.apiKey.length - 5)
-          : profile.apiKey
-      );
+      const apiKey = chalk.gray(validator.maskApiKey(profile.apiKey));
       const updatedAt = chalk.gray(new Date(profile.updatedAt).toLocaleString());
 
       table.push([status, name, url, apiKey, updatedAt]);

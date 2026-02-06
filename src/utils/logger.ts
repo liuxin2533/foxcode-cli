@@ -7,6 +7,28 @@ import figures from 'figures';
  */
 export const logger = {
   /**
+   * 显示 FoxCode ASCII art banner
+   */
+  banner(version: string): void {
+    const logo = [
+      '  _____ ___  __  ______ ___  ___  ___ ',
+      ' |  ___/ _ \\ \\ \\/ / ___/ _ \\|   \\| __|',
+      ' | |_ | (_) | >  < |  | (_) | |) | _| ',
+      ' |_|  \\___/ /_/\\_\\_|  \\___/|___/|___|',
+    ];
+
+    console.log();
+    logo.forEach((line) => {
+      console.log(chalk.cyan.bold(line));
+    });
+    console.log();
+    console.log(
+      chalk.gray('  AI CLI 配置管理工具') + chalk.gray(' · ') + chalk.cyan(`v${version}`)
+    );
+    console.log();
+  },
+
+  /**
    * 成功消息
    */
   success(message: string): void {

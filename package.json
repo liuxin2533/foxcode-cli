@@ -1,6 +1,6 @@
 {
   "name": "foxcode",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "快速切换 Claude Code、Codex、Gemini CLI 配置的命令行工具",
   "type": "module",
   "bin": {

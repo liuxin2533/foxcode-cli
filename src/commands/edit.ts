@@ -1,11 +1,13 @@
 import inquirer from 'inquirer';
 import ora from 'ora';
+import chalk from 'chalk';
 import { configStore } from '../config/store.js';
 import { TOOL_CONFIGS } from '../config/presets.js';
 import { ConfigProfile } from '../config/types.js';
 import { getHandler } from '../handlers/index.js';
 import { logger } from '../utils/logger.js';
 import { validator } from '../utils/validator.js';
+import { promptUrlSelection } from '../utils/prompts.js';
 
 /**
  * 编辑配置命令
@@ -15,8 +17,8 @@ export async function editCommand(name?: string): Promise<void> {
     const profiles = configStore.getAllProfiles();
 
     if (profiles.length === 0) {
-      logger.warn('暂无配置');
-      logger.info('使用 "foxcode add" 添加新配置');
+      logger.warn('还没有任何配置，快来添加一个吧！');
+      logger.info(`运行 ${chalk.cyan('foxcode add')} 开始添加配置`);
       return;
     }
 
@@ -50,7 +52,7 @@ export async function editCommand(name?: string): Promise<void> {
 
     if (!profile) {
       logger.error(`配置 "${selectedName}" 不存在`);
-      logger.info('使用 "foxcode ls" 查看所有配置');
+      logger.info(`运行 ${chalk.cyan('foxcode ls')} 查看所有已保存的配置`);
       process.exit(1);
     }
 
@@ -60,7 +62,7 @@ export async function editCommand(name?: string): Promise<void> {
     logger.newLine();
     logger.info(`工具: ${toolConfig.displayName}`);
     logger.info(`当前 URL: ${profile.url}`);
-    logger.info(`当前 API Key: ${profile.apiKey.substring(0, 10)}...`);
+    logger.info(`当前 API Key: ${validator.maskApiKey(profile.apiKey)}`);
     logger.newLine();
 
     // 选择要编辑的字段
@@ -87,86 +89,9 @@ export async function editCommand(name?: string): Promise<void> {
 
     // 编辑 URL
     if (fields.includes('url')) {
-      const urlPresets = toolConfig.urlPresets;
-
-      if (urlPresets.length === 2 && urlPresets[1].value === 'custom') {
-        // 只有一个预设 + 自定义选项
-        const { urlChoice } = await inquirer.prompt<{ urlChoice: string }>([
-          {
-            type: 'list',
-            name: 'urlChoice',
-            message: '选择 URL:',
-            choices: [
-              { name: `默认 (${urlPresets[0].value})`, value: 'default' },
-              { name: '自定义 URL', value: 'custom' },
-              { name: '保持不变', value: 'keep' },
-            ],
-          },
-        ]);
-
-        if (urlChoice === 'default') {
-          newUrl = urlPresets[0].value;
-        } else if (urlChoice === 'custom') {
-          const { customUrl } = await inquirer.prompt<{ customUrl: string }>([
-            {
-              type: 'input',
-              name: 'customUrl',
-              message: '请输入新的 URL:',
-              default: profile.url,
-              validate: (input: string) => {
-                const trimmed = input.trim();
-                if (!trimmed) {
-                  return 'URL 不能为空';
-                }
-                if (!validator.isValidUrl(trimmed)) {
-                  return 'URL 格式无效，必须以 http:// 或 https:// 开头';
-                }
-                return true;
-              },
-            },
-          ]);
-          newUrl = validator.normalizeUrl(customUrl.trim());
-        }
-      } else {
-        // 多个预设
-        const { selectedUrl } = await inquirer.prompt<{ selectedUrl: string }>([
-          {
-            type: 'list',
-            name: 'selectedUrl',
-            message: '选择新的 URL:',
-            choices: [
-              ...urlPresets.map((preset) => ({
-                name: `${preset.label} ${preset.value !== 'custom' ? `(${preset.value})` : ''}`,
-                value: preset.value,
-              })),
-              { name: '保持不变', value: 'keep' },
-            ],
-          },
-        ]);
-
-        if (selectedUrl === 'custom') {
-          const { customUrl } = await inquirer.prompt<{ customUrl: string }>([
-            {
-              type: 'input',
-              name: 'customUrl',
-              message: '请输入新的 URL:',
-              default: profile.url,
-              validate: (input: string) => {
-                const trimmed = input.trim();
-                if (!trimmed) {
-                  return 'URL 不能为空';
-                }
-                if (!validator.isValidUrl(trimmed)) {
-                  return 'URL 格式无效，必须以 http:// 或 https:// 开头';
-                }
-                return true;
-              },
-            },
-          ]);
-          newUrl = validator.normalizeUrl(customUrl.trim());
-        } else if (selectedUrl !== 'keep') {
-          newUrl = selectedUrl;
-        }
+      const result = await promptUrlSelection(toolConfig.urlPresets, profile.url);
+      if (result !== null) {
+        newUrl = result;
       }
     }
 
@@ -248,16 +173,21 @@ export async function editCommand(name?: string): Promise<void> {
         }
       }
 
-      logger.newLine();
-      logger.success(`配置 "${profile.name}" 已更新成功！`);
-      
-      // 显示变化
+      const changes: string[] = [];
       if (newUrl !== profile.url) {
-        logger.info(`URL: ${profile.url} → ${newUrl}`);
+        changes.push(`${chalk.bold('URL')}     ${chalk.gray(profile.url)} → ${newUrl}`);
       }
       if (newApiKey !== profile.apiKey) {
-        logger.info(`API Key: 已更新`);
+        changes.push(`${chalk.bold('API Key')} 已更新`);
       }
+
+      const boxContent = [
+        `${chalk.bold('配置')}    ${profile.name}`,
+        `${chalk.bold('工具')}    ${toolConfig.displayName}`,
+        ...changes,
+      ].join('\n');
+
+      logger.box(boxContent, { title: '配置编辑成功', type: 'success' });
     } catch (error) {
       spinner.fail('保存配置失败');
       throw error;

@@ -1,6 +1,7 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import path from 'path';
+import os from 'os';
 import fs from 'fs-extra';
 import { backupUtils } from '../utils/backup.js';
 import { logger } from '../utils/logger.js';
@@ -112,13 +113,12 @@ async function restoreBackup(): Promise<void> {
   ]);
 
   // 解析备份文件名，确定目标路径
+  // 备份文件名格式: toolName--fileName--timestamp--random
   const fileName = path.basename(selectedBackup);
-  const parts = fileName.split('_');
-  const toolName = parts[0]; // claude, codex, gemini
-  // 移除最后两个部分（时间戳和随机数）
-  const originalFileName = parts.slice(1, parts.length - 2).join('_');
+  const parts = fileName.split('--');
+  const toolName = parts[0];
+  const originalFileName = parts[1];
 
-  const os = await import('os');
   const targetPath = path.join(os.homedir(), `.${toolName}`, originalFileName);
 
   logger.info(`将恢复到: ${targetPath}`);

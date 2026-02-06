@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { configStore } from '../config/store.js';
 import { TOOL_CONFIGS } from '../config/presets.js';
 import { logger } from '../utils/logger.js';
+import { validator } from '../utils/validator.js';
 
 /**
  * 显示当前配置命令
@@ -29,11 +30,7 @@ export async function currentCommand(): Promise<void> {
     console.log(chalk.white(`  URL: ${chalk.gray(profile.url)}`));
     console.log(
       chalk.white(
-        `  API Key: ${chalk.gray(
-          profile.apiKey.length > 20
-            ? profile.apiKey.substring(0, 10) + '...' + profile.apiKey.substring(profile.apiKey.length - 5)
-            : profile.apiKey
-        )}`
+        `  API Key: ${chalk.gray(validator.maskApiKey(profile.apiKey))}`
       )
     );
     console.log(chalk.white(`  配置目录: ${chalk.gray(toolConfig.configDir)}`));
@@ -42,7 +39,7 @@ export async function currentCommand(): Promise<void> {
   });
 
   if (!hasAny) {
-    logger.warn('当前未设置任何配置');
-    logger.info('使用 "foxcode use" 切换配置');
+    logger.warn('当前未激活任何配置');
+    logger.info(`运行 ${chalk.cyan('foxcode use')} 切换配置，或 ${chalk.cyan('foxcode add')} 添加新配置`);
   }
 }

@@ -17,13 +17,13 @@ export const backupUtils = {
       return null;
     }
 
-    // 使用更精确的时间戳（包含毫秒）+ 随机数避免冲突
     const now = new Date();
-    const timestamp = now.toISOString().replace(/[:.]/g, '-').replace('T', '_');
+    const timestamp = now.toISOString().replace(/[:.]/g, '-');
     const random = Math.random().toString(36).substring(2, 8);
     const fileName = path.basename(filePath);
     const toolName = path.basename(path.dirname(filePath));
-    const backupFileName = `${toolName}_${fileName}_${timestamp}_${random}`;
+    // 用 -- 作为主分隔符，避免文件名和时间戳中的 _ 导致解析歧义
+    const backupFileName = `${toolName}--${fileName}--${timestamp}--${random}`;
     const backupPath = path.join(BACKUP_DIR, backupFileName);
 
     await fileUtils.ensureDir(BACKUP_DIR);

@@ -1,4 +1,5 @@
 import inquirer from 'inquirer';
+import chalk from 'chalk';
 import { configStore } from '../config/store.js';
 import { logger } from '../utils/logger.js';
 import { TOOL_CONFIGS } from '../config/presets.js';
@@ -11,7 +12,7 @@ export async function removeCommand(name?: string): Promise<void> {
     const profiles = configStore.getAllProfiles();
 
     if (profiles.length === 0) {
-      logger.warn('暂无配置');
+      logger.warn('还没有任何配置，无需删除');
       return;
     }
 
@@ -45,6 +46,7 @@ export async function removeCommand(name?: string): Promise<void> {
 
     if (!profile) {
       logger.error(`配置 "${selectedName}" 不存在`);
+      logger.info(`运行 ${chalk.cyan('foxcode ls')} 查看所有已保存的配置`);
       process.exit(1);
     }
 
@@ -73,10 +75,16 @@ export async function removeCommand(name?: string): Promise<void> {
         configStore.clearCurrentProfile(profile.tool);
       }
 
-      logger.success(`配置 "${profile.name}" 已删除`);
-      logger.warn('注意: 配置文件未被删除，如需恢复可使用备份功能');
+      const toolConfig = TOOL_CONFIGS[profile.tool];
+      const boxContent = [
+        `${chalk.bold('配置')}    ${profile.name}`,
+        `${chalk.bold('工具')}    ${toolConfig.displayName}`,
+      ].join('\n');
+
+      logger.box(boxContent, { title: '配置已删除', type: 'warning' });
+      logger.info(`提示: 工具配置文件未被删除，如需恢复可使用 ${chalk.cyan('foxcode backup restore')}`);
     } else {
-      logger.error('删除配置失败');
+      logger.error('删除配置失败，请稍后重试');
     }
   } catch (error) {
     if (error instanceof Error) {

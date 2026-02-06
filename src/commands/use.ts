@@ -1,5 +1,6 @@
 import inquirer from 'inquirer';
 import ora from 'ora';
+import chalk from 'chalk';
 import { configStore } from '../config/store.js';
 import { getHandler } from '../handlers/index.js';
 import { logger } from '../utils/logger.js';
@@ -13,8 +14,8 @@ export async function useCommand(name?: string): Promise<void> {
     const profiles = configStore.getAllProfiles();
 
     if (profiles.length === 0) {
-      logger.warn('暂无配置');
-      logger.info('使用 "foxcode add" 添加新配置');
+      logger.warn('还没有任何配置，快来添加一个吧！');
+      logger.info(`运行 ${chalk.cyan('foxcode add')} 开始添加配置`);
       return;
     }
 
@@ -52,7 +53,7 @@ export async function useCommand(name?: string): Promise<void> {
 
     if (!profile) {
       logger.error(`配置 "${selectedName}" 不存在`);
-      logger.info('使用 "foxcode ls" 查看所有配置');
+      logger.info(`运行 ${chalk.cyan('foxcode ls')} 查看所有已保存的配置`);
       process.exit(1);
     }
 
@@ -66,12 +67,15 @@ export async function useCommand(name?: string): Promise<void> {
 
       spinner.succeed(`已切换到配置 "${profile.name}"`);
 
-      logger.newLine();
-      logger.info(`工具: ${TOOL_CONFIGS[profile.tool].displayName}`);
-      logger.info(`URL: ${profile.url}`);
-      logger.info(`配置目录: ${TOOL_CONFIGS[profile.tool].configDir}`);
-      logger.newLine();
-      logger.success('配置已生效！');
+      const toolConfig = TOOL_CONFIGS[profile.tool];
+      const boxContent = [
+        `${chalk.bold('工具')}    ${toolConfig.displayName}`,
+        `${chalk.bold('配置')}    ${profile.name}`,
+        `${chalk.bold('URL')}     ${profile.url}`,
+        `${chalk.bold('目录')}    ${toolConfig.configDir}`,
+      ].join('\n');
+
+      logger.box(boxContent, { title: '配置切换成功', type: 'success' });
     } catch (error) {
       spinner.fail('切换配置失败');
       throw error;
